@@ -1,0 +1,11 @@
+package rules;
+import com.naren.model.Order;
+dialect "mvel"
+
+rule "MASTERCARD"
+	when 
+		orderObj:Order(cardType=="MASTERCARD" && price>1000)
+	then
+		System.out.println("MASTERCARD discount has been added");
+		orderObj.setDiscount(10);
+end;

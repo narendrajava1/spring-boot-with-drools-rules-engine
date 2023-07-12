@@ -1,0 +1,52 @@
+import com.naren.model.Participant; //import – this is similar to Java import statement, here we need to specify the classes which we are inserting in the KnowledgeSession
+global com.naren.model.Rate rate; //global – this is used to define a global level variable for a session; this can be used to pass input parameter or to get an output parameter to summarize the information for a session
+dialect "mvel" //dialect – a dialect specifies the syntax employed in the expressions in the condition section or action section. By default the dialect is Java. Drools also support dialect mvel; it is an expression language for Java-based applications. It supports the field and method/getter access
+
+rule "Checking Existing Debt Against Loan Amount"  //rule – this defines a rule block with a rule name
+ when //when – this specifies a rule condition, in this example the conditions which are checked are loanAmount would be more than the two times of existingDebt
+  Participant((loanAmount!=null && existingDebt!=null) &&(loanAmount > (2 * existingDebt)))
+ then //then – this block executes the action when the conditions in the when block met. In this example, the loanStatus will be Rejected - Too Much Debt
+  rate.setLoanStatus("Rejected - Too Much Debt");
+  rate.setLoanRate(999);
+end
+
+rule "Checking Annual Salary is greater than 50000"
+ when
+  Participant(annualSalary!=null&&annualSalary <= 50000)
+  //participant : Participant(annualSalary!=null&&annualSalary <= 50000) we can use the object in this way also and then we can set the values in setter method in then flow
+ then
+  rate.setLoanStatus("Rejected - Too low salary");
+  rate.setLoanRate(999);
+end
+
+rule "Checking Credit Score less than 550"
+ when
+  Participant(creditScore !=null && creditScore < 550 , annualSalary!=null&& annualSalary > 50000,  (loanAmount!=null&&existingDebt!=null) && loanAmount < (2 * existingDebt))
+ then
+  rate.setLoanStatus("Rejected");
+  rate.setLoanRate(999);
+end
+
+rule "Checking Credit Score less than 650"
+ when
+  Participant(creditScore!=null&&(creditScore < 650 && creditScore >= 550), annualSalary!=null&&annualSalary > 50000,  (loanAmount!=null&&existingDebt!=null)&&loanAmount < (2 * existingDebt))
+ then
+  rate.setLoanStatus("Approved");
+  rate.setLoanRate(7.25);
+end
+
+rule "Checking Credit Score less than 750"
+ when
+  Participant(creditScore!=null&&(creditScore < 750 && creditScore >= 650), annualSalary!=null&&annualSalary > 50000,  (loanAmount!=null&&existingDebt!=null)&&loanAmount < (2 * existingDebt))
+ then
+  rate.setLoanStatus("Approved");
+  rate.setLoanRate(6.25);
+end
+
+rule "Checking Credit Score greater than 750"
+ when
+  Participant(creditScore!=null&&creditScore >= 750, annualSalary!=null&&annualSalary > 50000,  (loanAmount!=null&&existingDebt!=null)&&loanAmount < (2 * existingDebt))
+ then
+  rate.setLoanStatus("Approved");
+  rate.setLoanRate(5.25);
+end
